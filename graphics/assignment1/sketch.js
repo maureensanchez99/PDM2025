@@ -1,5 +1,5 @@
 function setup(){
-  createCanvas(1000, 1000);
+  createCanvas(900, 900);
   colorMode(HSB);
   angleMode(DEGREES);
 }
@@ -56,8 +56,17 @@ function drawImg3(x, y, w, h) {
   translate(x, y); 
   fill("black");  // background color
   rect(0, 0, w, h);  // shape for section
+  noStroke();
 
+  // created PacMan
+  fill("yellow");
+  arc(w/4, h/2, 150, 150, 220, 145);
 
+  // created ghost
+  fill("red");
+  arc(3* w/4, h/2, 125, 150, 180, 0);
+  fill("red");
+  rect(3* w/4 - 110.5, h/2, 125, 75);
   pop();  // ends the img in this section
 }
 
@@ -69,9 +78,11 @@ function drawImg4(x, y, w, h) {
   stroke("white");
   strokeWeight(5);
 
+  // creates circle
   fill("green");
   circle(w/2, h/2, 150);
 
+  // creates star
   fill("red");
   beginShape();
   vertex(50, 50);
