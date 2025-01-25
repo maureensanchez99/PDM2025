@@ -60,13 +60,23 @@ function drawImg3(x, y, w, h) {
 
   // created PacMan
   fill("yellow");
-  arc(w/4, h/2, 150, 150, 220, 145);
+  arc(w/4 + 75, h/2, 150, 150, 220, 145);
 
   // created ghost
   fill("red");
-  arc(3* w/4, h/2, 125, 150, 180, 0);
+  // ghost body
+  arc(w * 3/4 - 50, h/2 - 20, 150, 125, 180, 0);
   fill("red");
-  rect(3* w/4 - 110.5, h/2, 125, 75);
+  rect(w * 3/4 - 125, h/2 - 21, 150, 100);
+  // ghost eyes
+  fill("white");
+  circle(w * 3/4 - 90, h/2 - 10, 35);
+  fill("white");
+  circle(w * 3/4 - 5, h/2 - 10, 35);
+  fill("blue");
+  circle(w * 3/4 - 90, h/2 - 10, 20);
+  fill("blue");
+  circle(w * 3/4 - 5, h/2 - 10, 20);
   pop();  // ends the img in this section
 }
 
@@ -76,7 +86,7 @@ function drawImg4(x, y, w, h) {
   fill(242, 96, 42);  // background color
   rect(0, 0, w, h);  // shape for section
   stroke("white");
-  strokeWeight(3);
+  strokeWeight(5);
 
   // creates circle
   fill("green");
