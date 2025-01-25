@@ -76,7 +76,7 @@ function drawImg4(x, y, w, h) {
   fill(242, 96, 42);  // background color
   rect(0, 0, w, h);  // shape for section
   stroke("white");
-  strokeWeight(5);
+  strokeWeight(3);
 
   // creates circle
   fill("green");
@@ -85,7 +85,16 @@ function drawImg4(x, y, w, h) {
   // creates star
   fill("red");
   beginShape();
-  vertex(50, 50);
+  vertex(w/2 - 75, h/2 - 20);
+  vertex(w/2 - 20, h/2 - 20);
+  vertex(w/2, h/2 - 70);
+  vertex(w/2 + 20, h/2 - 20);
+  vertex(w/2 + 75, h/2 - 20);
+  vertex(w/2 + 30, h/2 + 10);
+  vertex(w/2 + 50, h/2 + 55);
+  vertex(w/2, h/2 + 30);
+  vertex(w/2 - 50, h/2 + 55);
+  vertex(w/2 - 30, h/2 + 10);
   endShape(CLOSE);
   pop();  // ends the img in this section
 }
