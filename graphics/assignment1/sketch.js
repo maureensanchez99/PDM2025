@@ -1,5 +1,5 @@
 function setup(){
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1000, 1000);
   colorMode(HSB);
   angleMode(DEGREES);
 }
@@ -14,6 +14,7 @@ function draw(){
 }
 
 function drawImg1(x, y, w, h) {
+  const sectionW = width / 2;
   push();  // starts a new img in this section
   translate(x, y);  // starting point for img
   fill(111, 69, 91);  // background color
@@ -21,11 +22,11 @@ function drawImg1(x, y, w, h) {
 
   // creating circle
   fill("white");
-  circle(0, 0, 50);
+  circle(sectionW - sectionW / 5, h / 2, 200);
 
   // creating square
   fill("white");
-  square(w/4, h/4, 50);
+  square(sectionW + sectionW / 5, h / 2 - 100, 200);
   pop();  // ends the img in this section
 }
 
@@ -34,8 +35,19 @@ function drawImg2(x, y, w, h) {
   translate(x, y); 
   fill("white");  // background color
   rect(0, 0, w, h);  // shape for section
+  noStroke();  // removes stroke from shape
 
+  // creating top circle
+  fill(346, 58, 100, 0.5);
+  circle(w/2, h/3, 125);
 
+  // creating right circle
+  fill(111, 69, 91, 0.5);
+  circle(w/2 + w/20, h/3 + h/4, 125);
+
+  // creating left circle
+  fill(240, 58, 92, 0.5);
+  circle(w/2 - w/20, h/3 + h/4, 125);
   pop();  // ends the img in this section
 }
 
@@ -54,7 +66,15 @@ function drawImg4(x, y, w, h) {
   translate(x, y); 
   fill(242, 96, 42);  // background color
   rect(0, 0, w, h);  // shape for section
+  stroke("white");
+  strokeWeight(5);
 
+  fill("green");
+  circle(w/2, h/2, 150);
 
+  fill("red");
+  beginShape();
+  vertex(50, 50);
+  endShape(CLOSE);
   pop();  // ends the img in this section
 }
