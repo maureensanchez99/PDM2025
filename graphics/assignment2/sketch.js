@@ -1,55 +1,49 @@
+let selectedColor = "black";
+
 function setup() {
   createCanvas(900, 900);
   colorMode(HSB);
   angleMode(DEGREES);
-}
-
-function draw() {
   background(195, 25, 90);
 
   drawCanvas();
 }
 
-function drawCanvas(){
-  push(); // starts the img
-  rect(100, 100, 700, 600);
-  fill("white");
-  drawPalette(105, 105);
-  push(); // ends the img in this section
-  if (mousePressed) {
+function draw(){
+  drawPalette(105, 105); // draws color pallette
+}
 
-  } else {
-    
-  }
+function drawCanvas(){
+  fill("white");
+  rect(100, 100, 700, 600); // creates blank canvas
 }
 
 function drawPalette(x, y){
-  push();
+  let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "magenta", "brown", "white", "black"];
 
-  fill("red");
-  square(x, y, 20);
-  fill("orange");
-  square(x, y + 30, 20);
-  fill("yellow");
-  square(x, y + 60, 20);
-  fill("green");
-  square(x, y + 90, 20);
-  fill("cyan");
-  square(x, y + 120, 20);
-  fill("blue");
-  square(x, y + 150, 20);
-  fill("magenta");
-  square(x, y + 180, 20);
-  fill("brown");
-  square(x, y + 210, 20);
-  fill("white");
-  square(x, y + 240, 20);
-  fill("black");
-  square(x, y + 270, 20);
-  push();
-  fill("white");
+  for(let i = 0; i < colors.length; i++) {
+    fill(colors[i]);
+    square(x, y + (i * 30), 20);
+  }
 }
 
 function mousePressed() {
+  let palletteX = 105, palletteY = 105;
+  let squareSize = 20;
+  let colors = ["red", "orange", "yellow", "green", "cyan", "blue", "magenta", "brown", "white", "black"];
 
+  for(let i = 0; i < colors.length; i++) {
+    if(mouseX > palletteX && mouseX < palletteX + squareSize && 
+      mouseY > palletteY + (i * 30) && mouseY < palletteY + (i * 30) + squareSize){
+      selectedColor = colors[i];
+      return;
+    }
+  }
+}
+
+function mouseDragged(){
+  if(mouseX > 100 && mouseX < 800 && mouseY > 100 && mouseY < 700){
+    stroke(selectedColor);
+    line(pmouseX, pmouseY, mouseX, mouseY);
+  }
 }
