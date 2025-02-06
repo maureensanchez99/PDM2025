@@ -1,4 +1,6 @@
 let cyclops;
+// can use p5 play library to use for animations, caution book code may be outdated with old version 
+// we can use code from class as starter code
 
 // to load images before the program is run
 // make sure to have some sort of media uploaded to folder
@@ -14,6 +16,20 @@ function draw() {
   background(220);
 
   animation = new SpriteAnimation(cyclops, 5, 5, 6);
+}
+
+function keyPressed(){
+
+}
+
+class Character {
+  constructor(x, y) {
+    switch(keyCode){
+      case UP_ARROW:
+        character.currentAnimation = "up";
+        break;
+    }
+  }
 }
 
 class SpriteAnimation {
