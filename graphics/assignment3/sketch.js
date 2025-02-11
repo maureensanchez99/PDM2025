@@ -12,38 +12,42 @@ function setup() {
   imageMode(CENTER);
 
   // creates robot sprite 
-  character = new Character(random(80, width-80),random(80, height-80));
-  character.addAnimation("down", new SpriteAnimation(robot, 6, 5, 6));
-  character.addAnimation("up", new SpriteAnimation(robot, 0, 5, 6));
-  character.addAnimation("stand", new SpriteAnimation(robot, 0, 0, 1));
-  character.currentAnimation = "stand";
+  robotCharacter = new Character(random(80, width-80),random(80, height-80));
+  robotCharacter.addAnimation("down", new SpriteAnimation(robot, 6, 5, 6));
+  robotCharacter.addAnimation("up", new SpriteAnimation(robot, 0, 5, 6));
+  robotCharacter.addAnimation("stand", new SpriteAnimation(robot, 0, 0, 1));
+  robotCharacter.currentAnimation = "stand";
 
   // creates monkey sprite
-  character = new Character(random(80, width-80),random(80, height-80));
-  character.addAnimation("down", new SpriteAnimation(monkey, 6, 5, 6));
-  character.addAnimation("up", new SpriteAnimation(monkey, 0, 5, 6));
-  character.addAnimation("stand", new SpriteAnimation(monkey, 0, 0, 1));
-  character.currentAnimation = "stand";
+  monkeyCharacter = new Character(random(80, width-80),random(80, height-80));
+  monkeyCharacter.addAnimation("left", new SpriteAnimation(monkey, 6, 5, 6));
+  monkeyCharacter.addAnimation("right", new SpriteAnimation(monkey, 0, 5, 6));
+  monkeyCharacter.addAnimation("stand", new SpriteAnimation(monkey, 0, 0, 1));
+  monkeyCharacter.currentAnimation = "stand";
 }
 
 function draw() {
   background(220);
 
-  character.draw();
+  robotCharacter.draw();
+  monkeyCharacter.draw();
 }
 
 function keyPressed() {
-  character.keyPressed();
+  robotCharacter.keyPressed();
+  monkeyCharacter.keyPressed();
 }
 
 function keyReleased() {
-  character.keyReleased();
+  robotCharacter.keyReleased();
+  monkeyCharacter.keyReleased();
 }
 
 class Character {
-  constructor(x, y) {
+  constructor(x, y, type) {
     this.x = x;
     this.y = y;
+    this.type = type;
     this.currentAnimation = null;
     this.animations = {};
   }
@@ -57,10 +61,16 @@ class Character {
     if (animation) {
       switch (this.currentAnimation) {
         case "up":
-          this.y -= 2;
+          if(this.type === "robot") this.y -= 2;
           break;
         case "down": 
-          this.y += 2;
+        if(this.type === "robot") this.y += 2;
+          break;
+        case "left":
+          if(this.type === "monkey") this.x -= 2;
+          break;
+        case "right": 
+        if(this.type === "monkey") this.x += 2;
           break;
       }
       push();
@@ -71,13 +81,12 @@ class Character {
   }
 
   keyPressed() {
-    switch(keyCode) {
-      case UP_ARROW:
-        this.currentAnimation = "up";
-        break;
-      case DOWN_ARROW:
-        this.currentAnimation = "down";
-        break;
+    if(this.type === "robot"){
+      if(keyCode === UP_ARROW) this.currentAnimation = "up";
+      if(keyCode === DOWN_ARROW) this.currentAnimation = "down";
+    } else if (this.type === "monkey") {
+      if(keyCode === LEFT_ARROW) this.currentAnimation = "left";
+      if(keyCode === RIGHT_ARROW) this.currentAnimation = "right";
     }
   }
   
