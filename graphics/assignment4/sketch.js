@@ -5,6 +5,9 @@ let GameStates = Object.freeze((
 ));
 
 let gameState = GameStates.START;
+let score = 0;
+let time = 10;
+let textPadding = 15;
 
 function setup() {
   createCanvas(400, 400);
