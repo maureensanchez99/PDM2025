@@ -1,4 +1,4 @@
-// 🥚 Game states
+// Game states
 let GameStates = Object.freeze({ 
   START: "start",
   PLAY: "play",
@@ -115,7 +115,7 @@ function resetGame() {
 
 function increaseBugSpeed() {
   for (let bug of bugs) {
-    bug.speed *= 1.05; 
+    bug.speed *= 1.25; 
   }
 }
 
