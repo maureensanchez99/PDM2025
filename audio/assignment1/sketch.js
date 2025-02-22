@@ -1,40 +1,40 @@
-let bells;
-let bellsPlaying = false;
-let playSample1;
+let startContext, samples, sampler, buton1, button2;
 
 function preload() {
-   bells = new Tone.Player("media/FamilyFeud.mp3").toDestination();
+  // sampler = new Tone.Player("media/cat.mp3").toDestination()
+  samples = new Tone.Players({
+    cat: "media/cat.mp3",
+    seagull: "media/seagulls.mp3"
+  }).toDestination()
 }
 
 function setup() {
   createCanvas(400, 400);
-  let startAudioButton = createButton("startAudio");
-  startAudioButton.mouseClicked(startAudio)
-  startAudioButton.position(0,0)
-  playSample1 = createButton("Play Sample 1")
-  playSample1.position(100, 0)
-  playSample1.mouseClicked(playSample)
+  startContext = createButton("Start Audio Context");
+  startContext.position(0,0);
+  startContext.mousePressed(startAudioContext)
+  button1 = createButton("Play Cat Sample");
+  button1.position(10, 30);
+  button2 = createButton("Play Seagull Sample");
+  button2.position(200, 30);
+  button1.mousePressed(() => {samples.player("cat").start()})
+  button2.mousePressed(() => {samples.player("seagull").start()})
+  // button1.mousePressed(() => {sampler.start()})
 }
 
 function draw() {
   background(220);
 }
 
-function startAudio() {
-  Tone.start().then(() => {
-    console.log("Tone has started")
-  })
-}
+// function playSample() {
+//   sampler.start()
+// }
 
-function playSample() {
-   if (!bellsPlaying) {
-    playSample1.html("Stop Sample 1")
-    bells.start()
-    bells.loop = true;
-    bellsPlaying = true;
-   } else if (bellsPlaying) {
-    playSample1.html("Play Sample 1")
-    bells.stop()
-    bellsPlaying = false;
-   }
+function startAudioContext() {
+  if (Tone.context.state != 'running') {
+    Tone.start();
+    console.log("Audio Context Started")
+  } else {
+    console.log("Audio Context is already running")
+  }
 }
