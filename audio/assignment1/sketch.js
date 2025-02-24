@@ -1,17 +1,17 @@
 let startContext, samples, sampler, buton1, button2, button3, button4;
 
 function preload() {
-  // sampler = new Tone.Player("media/cat.mp3").toDestination()
+  sampler = new Tone.Player("media/wolf_howl.mp3").toDestination()
   samples = new Tone.Players({
-    horror: "media/horror_background.mp3",
-    keyboard: "media/mechanical_keyboard.mp3",
-    movie: "media/movie_effect.mp3",
-    wolf: "media/wolf_howl.mp3"
+    horror: "media/audio/horror_background.mp3",
+    keyboard: "media/audio//mechanical_keyboard.mp3",
+    movie: "media/audio//movie_effect.mp3",
+    wolf: "media/audio//wolf_howl.mp3"
   }).toDestination()
 }
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(600, 500);
   startContext = createButton("Start Audio Context");
   startContext.position(0,0);
   startContext.mousePressed(startAudioContext)
@@ -27,7 +27,7 @@ function setup() {
   button2.mousePressed(() => {samples.player("keyboard").start()})
   button3.mousePressed(() => {samples.player("movie").start()})
   button4.mousePressed(() => {samples.player("wolf").start()})
-  // button1.mousePressed(() => {sampler.start()})
+  //button1.mousePressed(() => {sampler.start()})
 }
 
 function draw() {
