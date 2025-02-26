@@ -9,17 +9,10 @@ del.wet.value = 0.5;
 function preload() {
   samples = new Tone.Players({
     horror: "media/audio/horror_background.mp3",
-    keyboard: "media/audio//mechanical_keyboard.mp3",
-    movie: "media/audio//movie_effect.mp3",
-    wolf: "media/audio//wolf_howl.mp3"
-  }).toDestination()
-
-  samplerSamples = new Tone.Players({
-    horror: "media/audio/horror_background.mp3",
-    keyboard: "media/audio//mechanical_keyboard.mp3",
-    movie: "media/audio//movie_effect.mp3",
-    wolf: "media/audio//wolf_howl.mp3"
-  }).connect(del)
+    keyboard: "media/audio/mechanical_keyboard.mp3",
+    movie: "media/audio/movie_effect.mp3",
+    wolf: "media/audio/wolf_howl.mp3"
+  }).connect(del);
 }
 
 function setup() {
@@ -62,8 +55,9 @@ function draw() {
   text("Reverb Wet Amount: " + wetSlider.value(), 300, 290)
 }
 
-function playSample() {
-  sampler.start()
+function playSample(name) {
+  Tone.start();  
+  samples.player(name).start();
 }
 
 function startAudioContext() {
