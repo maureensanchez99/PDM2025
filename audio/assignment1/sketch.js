@@ -24,6 +24,7 @@ function preload() {
 
 function setup() {
   createCanvas(600, 500);
+
   // created buttons to play audio effects
   button1 = createButton("Play Horror Effect");
   button1.position(100, 50);
@@ -37,10 +38,28 @@ function setup() {
   button2.mousePressed(() => {samples.player("keyboard").start()})
   button3.mousePressed(() => {samples.player("movie").start()})
   button4.mousePressed(() => {samples.player("wolf").start()})
+
+  // sampler
+  delTimeSlider = createSlider(0, 1, 0, 0.01);
+  delTimeSlider.position(100, 150);
+  delTimeSlider.input(() => {del.delayTime.value = delTimeSlider.value()});
+  feedbackSlider = createSlider(0, 0.99, 0, 0.01);
+  feedbackSlider.position(300, 150);
+  feedbackSlider.input(() => {del.feedback.value = feedbackSlider.value()});
+  distSlider = createSlider(0, 10, 0, 0.01);
+  distSlider.position(100, 300);
+  distSlider.input(() => {dist.distortion = distSlider.value()});
+  wetSlider = createSlider(0, 1, 0, 0.01);
+  wetSlider.position(300, 300);
+  wetSlider.input(() => {rev.wet.value = wetSlider.value()});
 }
 
 function draw() {
   background(62, 201, 104);
+  text("Delay Time: " + delTimeSlider.value(), 100, 140);
+  text("Feedback Amount: " + feedbackSlider.value(), 300, 140);
+  text("Distortion Amount: " + distSlider.value(), 100, 290);
+  text("Reverb Wet Amount: " + wetSlider.value(), 300, 290)
 }
 
 function playSample() {
