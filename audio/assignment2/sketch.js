@@ -1,81 +1,114 @@
-let synth1, filt, rev, polySynth, noise1, noise2, ampEnv1, ampEnv2, filt1;
-
+let synth, polySynth, noise, filt, rev, dist;
+let ampEnv;
 let activeKey = null;
+let filterSlider, reverbSlider, distSlider;
+let startButton;
 
 let keyNotes = {
-  'a': 'A4',
-  's': 'B4',
-  'd': 'C5',
-  'f': 'D5'
-}
+  'a': 'C4', 's': 'D4', 'd': 'E4', 'f': 'F4',
+  'g': 'G4', 'h': 'A4', 'j': 'B4', 'k': 'C5'
+};
 
-let keyNotes1 = {
-  'q': 'D4',
-  'w': 'F4',
-  'e': 'A4'
-}
+let keyNotesPoly = {
+  'q': 'D4', 'w': 'F4', 'e': 'A4'
+};
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(windowWidth, 400);
+
+  // Create the "Start Audio" button
+  startButton = createButton("Start Audio");
+  startButton.position(width / 2 - 50, height / 2 - 20);
+  startButton.mousePressed(startAudio);
+
+  textSize(16);
+}
+ 
+function startAudio() {
+  // Remove button after clicking
+  startButton.remove();
+
+  // Effects
   filt = new Tone.Filter(1500, "lowpass").toDestination();
   rev = new Tone.Reverb(2).connect(filt);
-  synth1 = new Tone.Synth({
-    envelope: {
-      attack: 0.1,
-      decay: 0.2,
-      sustain: 0.9,
-      release: 0.3
-    }
-  }).connect(rev);
-  synth1.portamento.value = 0.5;
+  dist = new Tone.Distortion(0.2).connect(rev);
+
+  // Monophonic Synth
+  synth = new Tone.Synth({
+    oscillator: { type: 'sawtooth' },
+    envelope: { attack: 0.1, decay: 0.2, sustain: 0.9, release: 0.3 }
+  }).connect(dist);
+
+  // Polyphonic Synth
   polySynth = new Tone.PolySynth(Tone.Synth).connect(rev);
   polySynth.set({
-    envelope: {
-      attack: 0.1,
-      decay: 0.1,
-      sustain: 1,
-      release: 0.1
-    },
-    oscillator: {
-      type: 'sawtooth'
-    }
-  })
-  polySynth.volume.value = -6;
-  ampEnv1 = new Tone.AmplitudeEnvelope({
-    attack: 0.1,
-    decay: 0.5,
-    sustain: 0,
-    release: 0.1
-  }).toDestination();
-  filt1 = new Tone.Filter(1500, "highpass").connect(ampEnv1);
-  noise1 = new Tone.Noise('pink').start().connect(filt1)
+    oscillator: { type: 'square' },
+    envelope: { attack: 0.1, decay: 0.1, sustain: 1, release: 0.1 }
+  });
+
+  // Noise Generator
+  ampEnv = new Tone.AmplitudeEnvelope({ attack: 0.1, decay: 0.5, sustain: 0, release: 0.1 }).toDestination();
+  noise = new Tone.Noise('pink').start().connect(ampEnv);
+
+  // UI Sliders
+  filterSlider = createSlider(200, 5000, 1500, 10);
+  filterSlider.position(50, 300);
+  filterSlider.input(() => filt.frequency.value = filterSlider.value());
+
+  reverbSlider = createSlider(0, 10, 2, 0.1);
+  reverbSlider.position(250, 300);
+  reverbSlider.input(() => rev.decay = reverbSlider.value());
+
+  distSlider = createSlider(0, 1, 0.2, 0.01);
+  distSlider.position(450, 300);
+  distSlider.input(() => dist.distortion = distSlider.value());
 }
 
 function draw() {
-  background(220);
-  text("keys a-f are the monophonic synth,  \nkeys q-e are the polyphonic synth, \nkey z is the noise.", 20, 20)
-}
+  background(30);
+  fill(255);
+  
+  if (!synth) {
+    text("Press 'Start Audio' before using keys!", width / 2 - 100, height / 2 - 40);
+  } else {
+    text("Keys A–K = Play Synth, QWE = Polyphonic, Z = Noise", 50, 50);
+    text("Filter Cutoff", 50, 280);
+    text("Reverb Decay", 250, 280);
+    text("Distortion", 450, 280);
 
+    if (activeKey) {
+      textSize(32);
+      text("Playing: " + activeKey.toUpperCase(), width / 2 - 80, height / 2);
+    }
+  }
+}
+ 
 function keyPressed() {
+  if (!synth) return;  
   let pitch = keyNotes[key];
-  let pitch1 = keyNotes1[key];
+  let polyPitch = keyNotesPoly[key];
+
   if (pitch && key !== activeKey) {
-    synth1.triggerRelease();
+    synth.triggerRelease();
     activeKey = key;
-    synth1.triggerAttack(pitch);
-  } else if (pitch1) {
-    polySynth.triggerAttack(pitch1);
+    synth.triggerAttack(pitch);
+  } else if (polyPitch) {
+    polySynth.triggerAttack(polyPitch);
   } else if (key === "z") {
-    ampEnv1.triggerAttackRelease(0.1);
+    ampEnv.triggerAttackRelease(0.1);
   }
 }
 
+// Stop monophonic synth when key is released
 function keyReleased() {
-  let pitch1 = keyNotes1[key];
+  if (!synth) return;
+
+  let polyPitch = keyNotesPoly[key];
+
   if (key === activeKey) {
-    synth1.triggerRelease();
+    synth.triggerRelease();
     activeKey = null;
-  } else if (pitch1) {
-    polySynth.triggerRelease(pitch1);
+  } else if (polyPitch) {
+    polySynth.triggerRelease(polyPitch);
   }
 }
