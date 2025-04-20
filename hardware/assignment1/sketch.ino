@@ -10,7 +10,10 @@ You will need:
 For a challenge, have it say something in morse code.  
 */
 
-void void setup() {
+const int buttonPin1 = 2, buttonPin2 = 3; 
+const int ledPin1 = 4, ledPin2 = 5;  
+
+void setup() {
 
 }
 
