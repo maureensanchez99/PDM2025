@@ -16,23 +16,10 @@ let bugs = [];
 let bugCount = 10;
 
 const EGG_SIZE = 64;  
-  
-// Sound variable
-let bgm, squishSound, missSound, skitterSound, startSound, endSound;
-let skitterLoop, musicLoop;
 
 function preload() {
   gameFont = loadFont("media/PressStart2P-Regular.ttf");
   eggSpritesheet = loadImage("media/egg.png");  
-
-  // Load sound files
-  soundFormats("mp3", "wav");
-  bgm = loadSound("media/bgm.mp3");
-  squishSound = loadSound("media/squish.wav");
-  missSound = loadSound("media/miss.wav");
-  skitterSound = loadSound("media/skitter.wav");
-  startSound = loadSound("media/start.wav");
-  endSound = loadSound("media/end.wav");
 }
 
 function setup() {
@@ -44,18 +31,6 @@ function setup() {
   for (let i = 0; i < bugCount; i++) {
     bugs.push(new Bug(random(50, width - 50), random(50, height - 50)));
   }
-
-  // Background music setup
-  bgm.setLoop(true);
-  bgm.setVolume(0.5);
-
-  // Bug skittering loop
-  skitterLoop = new p5.Part();
-  let skitterPhrase = new p5.Phrase('skitter', () => {
-    if (random() > 0.7) skitterSound.play(); // Random chance to play skitter
-  }, [1, 0, 0, 1, 0, 1, 0, 0]); // Custom rhythm pattern
-  skitterLoop.addPhrase(skitterPhrase);
-  skitterLoop.setBPM(120);
 }
 
 function draw() {
@@ -94,12 +69,9 @@ function playGame() {
     bug.display();
   }
 
-  // Increase music speed as time runs out
-  let speedFactor = map(time, 30, 0, 1, 1.5);
-  bgm.rate(speedFactor);
-
   if (time <= 0) {
-    endGame();
+    gameState = GameStates.END;
+    if (score > highScore) highScore = score;
   }
 }
 
@@ -116,27 +88,18 @@ function keyPressed() {
   if ((gameState === GameStates.START || gameState === GameStates.END) && keyCode === ENTER) {
     resetGame();
     gameState = GameStates.PLAY;
-    startSound.play();
-    bgm.play();
-    skitterLoop.loop();
   }
 }
 
 function mousePressed() {
   if (gameState === GameStates.PLAY) {
-    let hit = false;
     for (let bug of bugs) {
       if (!bug.isSquished && bug.isClicked(mouseX, mouseY)) {
         bug.squish();
         score++;
         increaseBugSpeed();
-        squishSound.play();
-        hit = true;
         break;
       }
-    }
-    if (!hit) {
-      missSound.play(); // Play "miss" sound if user clicks and misses a bug
     }
   }
 }
@@ -148,20 +111,11 @@ function resetGame() {
   for (let i = 0; i < bugCount; i++) {
     bugs.push(new Bug(random(50, width - 50), random(50, height - 50)));
   }
-  bgm.rate(1); // Reset music speed
-}
-
-function endGame() {
-  gameState = GameStates.END;
-  if (score > highScore) highScore = score;
-  bgm.stop();
-  skitterLoop.stop();
-  endSound.play();
 }
 
 function increaseBugSpeed() {
   for (let bug of bugs) {
-    bug.speed *= 1.25;
+    bug.speed *= 1.25; 
   }
 }
 
@@ -187,7 +141,7 @@ class Bug {
 
       this.frameCounter++;
       if (this.frameCounter % this.frameInterval === 0) {
-        this.frame = (this.frame + 1) % 7;
+        this.frame = (this.frame + 1) % 7;  
       }
     }
   }
@@ -197,11 +151,11 @@ class Bug {
     translate(this.x, this.y);
 
     if (this.isSquished) {
-      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, 0, 32, 32, 32);
+      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, 0, 32, 32, 32);  
     } else {
       let angle = atan2(this.direction.y, this.direction.x);
-      rotate(angle + PI / 2);
-      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, this.frame * 32, 0, 32, 32);
+      rotate(angle + PI / 2);  
+      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, this.frame * 32, 0, 32, 32);  
     }
 
     pop();
