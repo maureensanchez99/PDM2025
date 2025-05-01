@@ -14,12 +14,23 @@ let gameFont;
 let eggSpritesheet;
 let bugs = [];
 let bugCount = 10;
+let squishSound;
+let fireColors;
 
 const EGG_SIZE = 64;  
 
 function preload() {
   gameFont = loadFont("media/PressStart2P-Regular.ttf");
-  eggSpritesheet = loadImage("media/egg.png");  
+  eggSpritesheet = loadImage("media/egg.png");
+  backgroundImage = loadImage("media/bg.jpg");
+
+  if (typeof Tone !== "undefined") {
+    squishSound = new Tone.Player("media/audio/egg_cracking.mp3", () => {
+      console.log("Squish sound loaded");
+    }).toDestination();
+  } else {
+    console.error("Tone.js library is not loaded. Please include it in your project.");
+  }
 }
 
 function setup() {
@@ -34,7 +45,7 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  image(backgroundImage, width/2, height/2, width, height);
 
   switch (gameState) {
     case GameStates.START:
@@ -95,6 +106,7 @@ function mousePressed() {
   if (gameState === GameStates.PLAY) {
     for (let bug of bugs) {
       if (!bug.isSquished && bug.isClicked(mouseX, mouseY)) {
+        squishSound.start();
         bug.squish();
         score++;
         increaseBugSpeed();
@@ -151,7 +163,7 @@ class Bug {
     translate(this.x, this.y);
 
     if (this.isSquished) {
-      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, 0, 32, 32, 32);  
+      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, 0, 32, 32, 32); 
     } else {
       let angle = atan2(this.direction.y, this.direction.x);
       rotate(angle + PI / 2);  
@@ -168,5 +180,11 @@ class Bug {
   squish() {
     this.isSquished = true;
     this.speed = 0;
+
+    // Stop the sound if it's already playing, then start it
+    if (squishSound.state === "started") {
+      squishSound.stop();
+    }
+    squishSound.start();
   }
 }

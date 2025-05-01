@@ -1,55 +1,73 @@
-let punchImage, afterImage;
-let synth, noise, filt, rev, dist, ampEnv;
-let lfo;
+let synth, reverb, punchImage;
+let notes = {
+  'a': 'C4',
+  's': 'D4',
+  'd': 'E4',
+  'f': 'F4',
+  'g': 'G4',
+  'h': 'A4',
+  'j': 'B4',
+  'k': 'C5'
+};
 
 function preload() {
-  punchImage = loadImage('media/punch.png');
-  afterImage = loadImage('media/after.png');
+  // Load the punch image
+  punchImage = loadImage('punch.png', 
+    () => console.log("Image loaded successfully"), 
+    () => console.error("Failed to load image. Check the file path.")
+  );
 }
 
 function setup() {
-  createCanvas(800, 600);
-  console.log("Setup function is running");
+  createCanvas(400, 400);
 
-  // effects
-  filt = new Tone.Filter(200, "lowpass").toDestination();  
-  rev = new Tone.Reverb(4).connect(filt);  
-  dist = new Tone.Distortion(0.4).connect(rev);  
+  // Create a polyphonic synth and connect it to a reverb effect
+  synth = new Tone.PolySynth(Tone.Synth);
+  reverb = new Tone.Reverb(0.5).toDestination();
+  synth.connect(reverb);
 
-  // monophonic synth
-  synth = new Tone.Synth({
-    oscillator: { type: 'triangle' }, 
-    envelope: { attack: 0.05, decay: 0.3, sustain: 0.5, release: 1.0 }  
-  }).connect(dist);
-
-  // noise generator
-  ampEnv = new Tone.AmplitudeEnvelope({
-    attack: 0.01,
-    decay: 0.5,
-    sustain: 0,
-    release: 1.0  
-  }).toDestination();
-  noise = new Tone.Noise('brown').start().connect(ampEnv);  
-
-  // LFO for modulation
-  lfo = new Tone.LFO(2, 100, 400).start(); 
-  lfo.connect(filt.frequency);
+  // Create a slider to control the reverb decay
+  decaySlider = createSlider(0.1, 5, 1, 0.1);
+  decaySlider.position(120, 350);
+  decaySlider.input(() => {
+    reverb.decay = decaySlider.value();
+  });
 }
 
 function draw() {
-  console.log("Draw function is running");
-  background(punchImage);
+  background(220);
 
-  // makes the afterImage appear while the mouse is pressed
   if (mouseIsPressed) {
-    image(afterImage, 0, 0, 800, 600);
+    // Display the punch image when the mouse is pressed
+    imageMode(CENTER);
+    image(punchImage, width / 2, height / 2, 200, 200);
+  } else {
+    // Display instructions when the mouse is not pressed
+    fill(0);
+    textSize(16);
+    textAlign(CENTER, CENTER);
+    text("Press A–K to play notes.\nAdjust reverb decay with the slider.", width / 2, height / 2);
+  }
+
+  // Display the current reverb decay value
+  fill(0);
+  textSize(12);
+  textAlign(LEFT, CENTER);
+  text(`Reverb Decay: ${reverb.decay.toFixed(2)}`, 10, 370);
+}
+
+function keyPressed() {
+  // Play a note when a key is pressed
+  let note = notes[key];
+  if (note) {
+    synth.triggerAttack(note);
   }
 }
 
-function mousePressed() {
-  console.log("Mouse pressed");
-
-  // Trigger the synth and noise
-  synth.triggerAttackRelease("C2", 1.0);  
-  ampEnv.triggerAttackRelease(1.0);  
+function keyReleased() {
+  // Release the note when the key is released
+  let note = notes[key];
+  if (note) {
+    synth.triggerRelease(note, '+0.03'); // Add a slight delay to reduce popping
+  }
 }
