@@ -12,12 +12,14 @@ let time = 30;
 let textPadding = 15;
 let gameFont;
 let eggSpritesheet;
+let backgroundImage;
 let bugs = [];
 let bugCount = 10;
 let squishSound;
-let fireColors;
+let backgroundNoise;
 
-const EGG_SIZE = 64;  
+const EGG_SIZE = 64;
+let bugSpeedMultiplier = 1;
 
 function preload() {
   gameFont = loadFont("media/PressStart2P-Regular.ttf");
@@ -28,8 +30,10 @@ function preload() {
     squishSound = new Tone.Player("media/audio/egg_cracking.mp3", () => {
       console.log("Squish sound loaded");
     }).toDestination();
-  } else {
-    console.error("Tone.js library is not loaded. Please include it in your project.");
+
+    backgroundNoise = new Tone.Player("media/audio/clown_jingle.mp3", () => {
+      console.log("Background noise loaded");
+    }).toDestination();
   }
 }
 
@@ -45,7 +49,7 @@ function setup() {
 }
 
 function draw() {
-  image(backgroundImage, width/2, height/2, width, height);
+  image(backgroundImage, width / 2, height / 2, width, height);
 
   switch (gameState) {
     case GameStates.START:
@@ -57,6 +61,70 @@ function draw() {
     case GameStates.END:
       displayEndScreen();
       break;
+  }
+}
+
+function keyPressed() {
+  if ((gameState === GameStates.START || gameState === GameStates.END) && keyCode === ENTER) {
+    if (typeof Tone !== "undefined" && Tone.context.state !== "running") {
+      Tone.start().then(() => {
+        if (backgroundNoise && backgroundNoise.state !== "started") {
+          backgroundNoise.loop = true;
+          backgroundNoise.start();
+        }
+      });
+    } else if (backgroundNoise && backgroundNoise.state !== "started") {
+      backgroundNoise.loop = true;
+      backgroundNoise.start();
+    }
+
+    resetGame();
+    gameState = GameStates.PLAY;
+  }
+}
+
+function mousePressed() {
+  if (gameState === GameStates.PLAY) {
+    for (let bug of bugs) {
+      if (!bug.isSquished && bug.isClicked(mouseX, mouseY)) {
+        if (squishSound) {
+          if (squishSound.state === "started") {
+            squishSound.stop();
+          }
+          squishSound.start();
+        }
+        bug.squish();
+        score++;
+        increaseBugSpeed();
+        break;
+      }
+    }
+  }
+}
+
+function resetGame() {
+  score = 0;
+  time = 30;
+  bugSpeedMultiplier = 1;
+  bugs = [];
+  for (let i = 0; i < bugCount; i++) {
+    bugs.push(new Bug(random(50, width - 50), random(50, height - 50)));
+  }
+
+  if (backgroundNoise) {
+    backgroundNoise.playbackRate = 1; // Reset music speed
+  }
+}
+
+function increaseBugSpeed() {
+  bugSpeedMultiplier *= 1.25;
+
+  for (let bug of bugs) {
+    bug.speed *= 1.25;
+  }
+
+  if (backgroundNoise) {
+    backgroundNoise.playbackRate = bugSpeedMultiplier;
   }
 }
 
@@ -95,42 +163,6 @@ function displayEndScreen() {
   text("Press ENTER to Restart", width / 2, height / 2 + 50);
 }
 
-function keyPressed() {
-  if ((gameState === GameStates.START || gameState === GameStates.END) && keyCode === ENTER) {
-    resetGame();
-    gameState = GameStates.PLAY;
-  }
-}
-
-function mousePressed() {
-  if (gameState === GameStates.PLAY) {
-    for (let bug of bugs) {
-      if (!bug.isSquished && bug.isClicked(mouseX, mouseY)) {
-        squishSound.start();
-        bug.squish();
-        score++;
-        increaseBugSpeed();
-        break;
-      }
-    }
-  }
-}
-
-function resetGame() {
-  score = 0;
-  time = 30;
-  bugs = [];
-  for (let i = 0; i < bugCount; i++) {
-    bugs.push(new Bug(random(50, width - 50), random(50, height - 50)));
-  }
-}
-
-function increaseBugSpeed() {
-  for (let bug of bugs) {
-    bug.speed *= 1.25; 
-  }
-}
-
 class Bug {
   constructor(x, y) {
     this.x = x;
@@ -153,7 +185,7 @@ class Bug {
 
       this.frameCounter++;
       if (this.frameCounter % this.frameInterval === 0) {
-        this.frame = (this.frame + 1) % 7;  
+        this.frame = (this.frame + 1) % 7;
       }
     }
   }
@@ -163,11 +195,11 @@ class Bug {
     translate(this.x, this.y);
 
     if (this.isSquished) {
-      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, 0, 32, 32, 32); 
+      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, 0, 32, 32, 32);
     } else {
       let angle = atan2(this.direction.y, this.direction.x);
-      rotate(angle + PI / 2);  
-      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, this.frame * 32, 0, 32, 32);  
+      rotate(angle + PI / 2);
+      image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, this.frame * 32, 0, 32, 32);
     }
 
     pop();
@@ -180,11 +212,5 @@ class Bug {
   squish() {
     this.isSquished = true;
     this.speed = 0;
-
-    // Stop the sound if it's already playing, then start it
-    if (squishSound.state === "started") {
-      squishSound.stop();
-    }
-    squishSound.start();
   }
 }
