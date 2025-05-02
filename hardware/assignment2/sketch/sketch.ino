@@ -44,7 +44,7 @@ void loop() {
 
   delay(5000);
 
-  // player2's turn
+  // player2's turn 
   turn(randomNum, ledPin2);
   
   Serial.println(value, DEC); // testing sensor value
