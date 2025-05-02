@@ -11,10 +11,22 @@ You must include at least one sentence describing each of the following componen
 
 #include <Arduino.h>
 
+const int ledPin1 = 12, ledPin2 = 13;  // LED pins
+const int soundPin = A0;
+int value = 0;
+
 void setup() {
-   
+  // starts the serial so I can run test messages
+  Serial.begin(9600); 
+
+  // intializes LEDs as outputs
+  pinMode(ledPin1, OUTPUT);
+  pinMode(ledPin2, OUTPUT);
 }
 
 void loop() {
+  value = analogRead(soundPin);
   
+  Serial.println(value, DEC);
+  delay(200);
 }
