@@ -18,6 +18,7 @@ const int ledPin1 = 12, ledPin2 = 13;  // LED pins
 
 
 void setup() {
+    Serial.begin(9600);
     // initalizes buttons to be inputs
     pinMode(buttonPin1, INPUT);
     pinMode(buttonPin2, INPUT);
@@ -32,8 +33,10 @@ void loop() {
     buttonPin2State = digitalRead(buttonPin2);
 
     if (buttonPin1State == HIGH){
+        Serial.println("Boo");
         boo();
     } else if (buttonPin2State == HIGH){
+        Serial.println("Get Out");
         getOut();
     }
 }
