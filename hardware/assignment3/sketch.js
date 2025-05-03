@@ -37,10 +37,6 @@ function draw() {
     port.write(msg);
   }
 
-  // Draw current LED color
-  //fill(r, g, b);
-  //ellipse(width / 2, height / 2, 100);
-
   // Read light sensor value from Arduino
   let str = port.readUntil('\n');
   if (str !== "") {
