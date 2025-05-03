@@ -15,58 +15,65 @@ rules, challenge, and interaction.
 
 #include <Arduino.h>
 
-const int ledPin1 = 12, ledPin2 = 13, ledMatch = 11;  // LED pins
-const int soundPin = A0;
-int value = 0, randomNum = 0, ledBrightness = 0, userLED = 0;
+const int buttonPin = 2;  // pushbutton pins
+const int ledPin1 = 9, ledPin2 = 10;  // LED pins
+const int lightPin = A0;
+int value = 0, ledBrightness = 0, userLED = 0;
+bool playerOneTurn = true;
+bool buttonPreviouslyPressed = false;
 
 void setup() {
   // starts the serial so I can run test messages
   Serial.begin(9600); 
 
+  // initalizes button to be inputs
+  pinMode(buttonPin, INPUT);
+
   // intializes LEDs as outputs
   pinMode(ledPin1, OUTPUT);
   pinMode(ledPin2, OUTPUT);
-}
-
-void loop() {
-  // generates a random number that will be within the range of the sound sensor
-  randomNum = random(0, 1023);
 
   // explains how the game works
   game();
+}
 
-  // maps random number to be into LED range that user has to match
-  ledBrightness = LEDmap(randomNum);
-  analogWrite(ledMatch, ledBrightness);
+void loop() {
+  buttonPinState = digitalRead(buttonPin);
+  value = analogRead(lightPin);
+  Serial.print("Current light value: ");
+  Serial.println(value);
 
-  // player1's turn
-  turn(randomNum, ledPin1);
+  while(buttonPinState == LOW) {
+    // player1's turn
+    Serial.println("Player 1's Turn");
+    turn(ledPin1);
+    buttonPinState = digitalRead(buttonPin);
+    delay(2000);
+  }
+  // player2's turn
+  Serial.println("Player 2's Turn");
+  turn(ledPin2);
 
+  Serial.println(); // testing sensor value
   delay(5000);
-
-  // player2's turn 
-  turn(randomNum, ledPin2);
-  
-  Serial.println(value, DEC); // testing sensor value
-  delay(200);
 }
 
 void game(){
-  Serial.println("Welcome to the Sound Match game!");
-  Serial.println("A random value will be generated that you must match to be caught by the sound sensor.");
-  Serial.println("Whoever's light glowest the brightest is the closest to matching the value");
+  Serial.println("Welcome to the Brightest Light game!");
+  Serial.println("Whoever can make their light glow the brightest is the winner.");
 }
 
-// maps number to be into LED range
-int LEDmap(int value){
-  return map(value, 0, 1023, 0, 255);
+// changes value from photoresistor to be of that range to be of range for LED lights
+int mapLED(int userValue) {
+  return map(userValue, 0, 1015, 0, 255);
 }
 
-void turn(int match, int LED){
-  // reading the value from the sound sensor
-  value = analogRead(soundPin);
+void turn(int LED){
+  // reading the value from the light sensor
+  value = analogRead(lightPin);
+
   Serial.println(value, DEC); // testing sensor value
-  // maps collected user value to be into LED range that user captures
-  userLED = LEDmap(value);
+  userLED = mapLED(value);
+  // write collected user value to be into LED range that user captures
   analogWrite(LED, userLED);
 }
