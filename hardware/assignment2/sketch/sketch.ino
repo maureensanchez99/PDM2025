@@ -1,79 +1,67 @@
-/*
-Assignment 2 of Hardware Section  
-PWM Game  
-
-Create a two-person game using at least one analog input (Photoresistor, pressure sensor, flex sensor, etc. 
-typically in a resistor-divider network) and at least one pulse-width-modulated (Analog) output (buzzer, LED, etc).     
-
-For instance, you could create a circuit that has a user press a pressure sensor causing an LED to become steadily 
-righter and then stays at it's brightest point. Then the next person tries to make another light go brighter. Perhaps 
-if they go too far, it reverses direction and dims.  
-
-You must include at least one sentence describing each of the following components in the comments: game objective, 
-rules, challenge, and interaction.  
-*/
-
 #include <Arduino.h>
 
-const int buttonPin = 2;  // pushbutton pins
+// Pin Setup
+const int buttonPin = 2;  // pushbutton pin
 const int ledPin1 = 9, ledPin2 = 10;  // LED pins
-const int lightPin = A0;
-int value = 0, ledBrightness = 0, userLED = 0;
-bool playerOneTurn = true;
+const int lightPin = A0;  // Photoresistor pin
+
+// Variables
+bool playerTurn = true;  // true = Player 1, false = Player 2
 bool buttonPreviouslyPressed = false;
 
 void setup() {
-  // starts the serial so I can run test messages
   Serial.begin(9600); 
 
-  // initalizes button to be inputs
-  pinMode(buttonPin, INPUT);
-
-  // intializes LEDs as outputs
+  pinMode(buttonPin, INPUT_PULLUP); // using internal pull-up resistor
   pinMode(ledPin1, OUTPUT);
   pinMode(ledPin2, OUTPUT);
 
-  // explains how the game works
   game();
+  Serial.println("Press the button to start Player 1's turn.");
 }
 
 void loop() {
-  buttonPinState = digitalRead(buttonPin);
-  value = analogRead(lightPin);
-  Serial.print("Current light value: ");
-  Serial.println(value);
+  bool buttonPressed = digitalRead(buttonPin) == LOW;
 
-  while(buttonPinState == LOW) {
-    // player1's turn
-    Serial.println("Player 1's Turn");
-    turn(ledPin1);
-    buttonPinState = digitalRead(buttonPin);
-    delay(2000);
+  // Detect rising edge (button just pressed)
+  if (buttonPressed && !buttonPreviouslyPressed) {
+    // Indicate whose turn it is
+    Serial.println(playerTurn ? "Player 1's Turn" : "Player 2's Turn");
+
+    // Run the turn for the active player
+    turn(playerTurn ? ledPin1 : ledPin2);
+
+    //delay(5000);
+
+    // Switch turn
+    playerTurn = !playerTurn;
+
+    Serial.println("Press the button for the next player's turn.");
   }
-  // player2's turn
-  Serial.println("Player 2's Turn");
-  turn(ledPin2);
 
-  Serial.println(); // testing sensor value
-  delay(5000);
+  // Update the previous button state
+  buttonPreviouslyPressed = buttonPressed;
 }
 
 void game(){
   Serial.println("Welcome to the Brightest Light game!");
   Serial.println("Whoever can make their light glow the brightest is the winner.");
+  Serial.println("Players take turns pressing the button and using the light sensor to set their LED brightness.");
 }
 
-// changes value from photoresistor to be of that range to be of range for LED lights
+// Map the sensor value to LED brightness range
 int mapLED(int userValue) {
   return map(userValue, 0, 1015, 0, 255);
 }
 
 void turn(int LED){
-  // reading the value from the light sensor
-  value = analogRead(lightPin);
+  // Read from the light sensor once
+  int value = analogRead(lightPin);
+  int userLED = mapLED(value);
 
-  Serial.println(value, DEC); // testing sensor value
-  userLED = mapLED(value);
-  // write collected user value to be into LED range that user captures
+  Serial.println("Sensor Value: ");
+  Serial.print(value);
+  Serial.println();
+  // Set LED brightness
   analogWrite(LED, userLED);
 }
