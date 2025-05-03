@@ -1,16 +1,16 @@
 let port;
 let connectButton;
 let rSlider, gSlider, bSlider;
+let backgroundColor;
 
 function setup() {
   createCanvas(400, 400);
+  colorMode(HSB, 360, 255, 255);
 
-  // Create Connect Button
   connectButton = createButton('Connect');
   connectButton.position(10, 10);
   connectButton.mousePressed(connect);
 
-  // Create RGB sliders
   rSlider = createSlider(0, 255, 127);
   rSlider.position(10, 50);
   gSlider = createSlider(0, 255, 127);
@@ -19,35 +19,40 @@ function setup() {
   bSlider.position(10, 110);
 
   noStroke();
+  backgroundColor = color(0, 0, 220);
 
   port = createSerial();
 }
 
 function draw() {
-  background(220);
+  background(backgroundColor);
 
-  // Get RGB values from sliders
+  // Send RGB to Arduino
   let r = rSlider.value();
   let g = gSlider.value();
   let b = bSlider.value();
 
-  // Draw current color
-  fill(r, g, b);
-  ellipse(width / 2, height / 2, 100);
-
-  // Send RGB values to Arduino if port is open
   if (port.opened()) {
     let msg = `${r} ${g} ${b}\n`;
     port.write(msg);
   }
 
-  // Read incoming serial data (if any)
+  // Draw current LED color
+  //fill(r, g, b);
+  //ellipse(width / 2, height / 2, 100);
+
+  // Read light sensor value from Arduino
   let str = port.readUntil('\n');
   if (str !== "") {
-    console.log("Received from Arduino:", str.trim());
+    let lightVal = Number(str.trim());
+    if (!isNaN(lightVal)) {
+      // Set background hue based on light level
+      let hue = map(lightVal, 0, 1023, 240, 0);        // hue: blue to red
+      let brightness = map(lightVal, 0, 1023, 50, 255); // low light = dark
+      backgroundColor = color(hue, 180, brightness);
+    }
   }
-
-  // Draw slider labels
+  
   fill(0);
   text("Red", rSlider.x * 2 + rSlider.width, 65);
   text("Green", gSlider.x * 2 + gSlider.width, 95);

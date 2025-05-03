@@ -2,8 +2,9 @@
 
 */
 
-int redPin = 5, int greenPin = 6, int bluePin = 9;
+int redPin = 5, greenPin = 6, bluePin = 9;
 int lightPin = A0;
+int value = 0;
 
 void setup() {
   Serial.begin(9600);   
@@ -12,10 +13,13 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
+
+  // photoresistor pin
+  pinMode(lightPin, INPUT);
 }
 
 void loop() {
-  while (Serial.available() > 0) {
+  if (Serial.available() > 0) {
     int red = Serial.parseInt();
     int green = Serial.parseInt();
     int blue = Serial.parseInt();
@@ -28,8 +32,11 @@ void loop() {
       analogWrite(redPin, red);
       analogWrite(greenPin, green);
       analogWrite(bluePin, blue);
-    } else {
-      while (Serial.available() > 0) Serial.read(); // flush bad data
     }
   }
+
+  // read and send photoresistor value
+  value = analogRead(lightPin);
+  Serial.println(value);
+  delay(100); // Prevent flooding the serial port
 }
