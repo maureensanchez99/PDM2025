@@ -1,5 +1,5 @@
 let port;
-let connectButton, lightningButton;
+let connectButton, lightningButton, windButton;
 let backgroundColor;
 
 let playLightning = false;
@@ -64,6 +64,13 @@ function setup() {
     eggSpeed = playLightning ? originalEggSpeed * 3 : originalEggSpeed; // Reset to original speed when turned off
   });
 
+  windButton = createButton("Wind");
+  windButton.position(100, 600);
+  windButton.mousePressed(() => {
+    cloudSpeed = cloudSpeed * 3;  // clouds move faster
+    // sprite move slower when moving against the wind
+  });
+
   /*Tone.start();
   chimeSynth = new Tone.MetalSynth({
     frequency: 400,
@@ -87,6 +94,7 @@ function draw() {
   background(backgroundColor);
   drawGround();
   drawLightning();
+  drawWind();
   drawEgg();
   if (frameCount % 6 === 0) {
     if (port.opened()) {
@@ -226,4 +234,8 @@ function drawClouds() {
   }*/
 
   pop();
+}
+
+function drawWind(){
+  // make wind animation pop up
 }
