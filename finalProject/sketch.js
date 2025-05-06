@@ -2,6 +2,19 @@ let port;
 let connectButton, lightningButton;
 let backgroundColor;
 let playLightning = false;
+let eggSpriteSheet;
+let eggX = 0;  
+let eggSpeed = 0.75; 
+let eggFrame = 0;  
+let eggFrameInterval = 8;  
+let eggFrameCounter = 0;  
+const EGG_FRAMES = 7;
+const EGG_SIZE = 64; // Set the size of the egg sprite
+
+function preload() {
+  eggSpritesheet = loadImage("media/egg.png");  
+}
+
 
 function setup() {
   createCanvas(700, 500);
@@ -29,6 +42,7 @@ function draw() {
   
   drawGround();
   drawLightning();
+  drawEgg();
 
   // Read light sensor value from Arduino
   let str = port.readUntil('\n');
@@ -74,4 +88,40 @@ function drawLightning() {
 
 function connectToSerial() {
   port.open('Arduino', 9600);
+}
+
+function drawEgg() {
+  push();
+
+  // flips the egg sprite if moving left
+  if (eggSpeed < 0) {
+    translate(eggX + EGG_SIZE / 2, height - 50 - EGG_SIZE / 2);  
+    scale(-1, 1);  
+    translate(-EGG_SIZE / 2, -EGG_SIZE / 2);  
+  } else {
+    translate(eggX, height - 50 - EGG_SIZE);  
+  }
+
+  // calculates the current frame of the sprite sheet
+  let sx = eggFrame * 32;  
+  let sy = 0; 
+
+  // draws the current frame of the egg sprite
+  image(eggSpritesheet, 0, 0, EGG_SIZE, EGG_SIZE, sx, sy, 32, 32);
+
+  pop();
+
+  // updates the egg's position
+  eggX += eggSpeed;
+
+  // reverses direction if the egg reaches the edges of the canvas
+  if (eggX <= 0 || eggX + EGG_SIZE >= width) {
+    eggSpeed *= -1;
+  }
+
+  // updates the animation frame
+  eggFrameCounter++;
+  if (eggFrameCounter % eggFrameInterval === 0) {
+    eggFrame = (eggFrame + 1) % EGG_FRAMES; // loops through the frames
+  }
 }
