@@ -1,10 +1,13 @@
 let port;
 let connectButton, lightningButton;
 let backgroundColor;
+
+
 let playLightning = false;
 let thunderNoise, thunderEnv;
 let lastLightningSoundTime = 0;
 const lightningSoundInterval = 1000;
+
 let eggSpriteSheet;
 let eggX = 0;  
 let eggSpeed = 0.75; 
@@ -13,6 +16,10 @@ let eggFrameInterval = 8;
 let eggFrameCounter = 0;  
 const EGG_FRAMES = 7;
 const EGG_SIZE = 64; 
+
+let cloudX = 0;  
+let cloudSpeed = 0.5; 
+let clouds = [];
 
 function preload() {
   eggSpritesheet = loadImage("media/egg.png");  
@@ -28,6 +35,18 @@ function setup() {
   connectButton.mousePressed(connectToSerial);
 
   backgroundColor = color(140, 206, 230);
+
+  for (let i = 0; i < 5; i++) {
+    let y = random(50, 200);
+    clouds.push({
+      x: random(-200, width),
+      y: y,
+      speed: random(0.1, 0.3), // slower clouds
+      size: random(0.8, 1.5),
+      alpha: map(y, 50, 200, 200, 100) // higher clouds are more transparent
+    });
+  }
+  
   let originalEggSpeed = eggSpeed; // stores the original speed of the egg
 
   lightningButton = createButton("Lightning");
@@ -43,6 +62,7 @@ function draw() {
   drawGround();
   drawLightning();
   drawEgg();
+  drawClouds();
   if (frameCount % 6 === 0) {
     if (port.opened()) {
       let msg = playLightning ? "1\n" : "0\n";  
@@ -53,8 +73,10 @@ function draw() {
     if (str !== "") {
       let lightVal = Number(str.trim());
       if (!isNaN(lightVal)) {
-        let hue = map(lightVal, 0, 132, 0, 360);
-        backgroundColor = color(hue, 255, 255);
+        let brightness = map(lightVal, 100, 950, 0, 255);   
+        let fixedHue = 170;   
+        let saturation = 200;  
+        backgroundColor = color(fixedHue, saturation, brightness);
       }
     }
   }
@@ -130,4 +152,24 @@ function drawEgg() {
   if (eggFrameCounter % eggFrameInterval === 0) {
     eggFrame = (eggFrame + 1) % EGG_FRAMES; // loops through the frames
   }
+}
+
+function drawClouds() {
+  push();
+  noStroke();
+
+  for (let cloud of clouds) {
+    let { x, y, size, speed, alpha } = cloud;
+    // Cloud shape
+    ellipse(x, y, 80 * size, 50 * size);
+    ellipse(x + 40 * size, y, 80 * size, 50 * size);
+    ellipse(x + 20 * size, y - 20 * size, 80 * size, 50 * size);
+
+    cloud.x += speed;
+
+    if (cloud.x > width + 100) {
+      cloud.x = -150;
+    }
+  }
+  pop();
 }

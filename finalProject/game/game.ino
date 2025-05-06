@@ -37,8 +37,15 @@ void loop() {
     }
   }
 
+  // Read sensors
+  buttonState = digitalRead(buttonPin);
   value = analogRead(lightSensor);
-  Serial.println(value);
+
+  // Send both values as CSV
+  Serial.print(value);
+  Serial.print(",");
+  Serial.println(buttonState);
+
   delay(100);
 
   // If thunder is enabled, play it incrementally
