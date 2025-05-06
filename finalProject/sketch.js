@@ -21,8 +21,8 @@ let cloudSpeed = 0.5;
 let clouds = [];
 let cloudsOn = false;   
 
-let ambientSynth, ambientLoop;
-let isAmbientPlaying = false;
+let chimeSynth, chimePart;
+let isChimePlaying = false;
 
 function preload() {
   eggSpritesheet = loadImage("media/egg.png");  
@@ -59,7 +59,23 @@ function setup() {
     eggSpeed = playLightning ? originalEggSpeed * 3 : originalEggSpeed; // Reset to original speed when turned off
   });
 
-  
+  /*Tone.start();
+  chimeSynth = new Tone.MetalSynth({
+    frequency: 400,
+    envelope: {
+      attack: 0.001,
+      decay: 1.4,
+      release: 0.2
+    },
+    harmonicity: 5.1,
+    modulationIndex: 32,
+    resonance: 4000,
+    octaves: 1.5
+  }).toDestination();
+
+  chimePart = new Tone.Loop(time => {
+    chimeSynth.triggerAttackRelease("C6", "8n", time);
+  }, "2n");*/
 }
 
 function draw() {
@@ -86,8 +102,7 @@ function draw() {
           let saturation = 200;
           backgroundColor = color(fixedHue, saturation, brightness);
         }
-    
-        // buttonVal: 0 = pressed, 1 = not pressed
+
         cloudsOn = buttonVal === 0;
       }
     }
@@ -95,7 +110,13 @@ function draw() {
   }
   if (cloudsOn) {
     drawClouds();
-  }  
+  } else {
+    if (isChimePlaying) {
+      chimePart.stop();
+      Tone.Transport.stop();
+      isChimePlaying = false;
+    }
+  }   
 }
 
 function drawGround() {
@@ -186,5 +207,12 @@ function drawClouds() {
       cloud.x = -150;
     }
   }
+
+  /*if (!isChimePlaying) {
+    chimePart.start();
+    Tone.Transport.start();
+    isChimePlaying = true;
+  }*/
+
   pop();
 }
