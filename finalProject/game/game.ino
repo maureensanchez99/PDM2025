@@ -1,12 +1,14 @@
 const int buzzerPin = 8;
 const int LEDpin = 9;
 const int buttonPin = 2;
+const int lightSensor = A0;
 
 int buttonState = 0;
 int brightness = 255;
+int value = 0;
+
 int thunderNoise;
 int isThunder = false;
-
 unsigned long lastUpdate = 0;
 int thunderStep = 0;
 bool inRumble = false;
@@ -17,6 +19,7 @@ void setup() {
   pinMode(buzzerPin, OUTPUT);
   pinMode(LEDpin, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(lightSensor, INPUT);
 }
 
 void loop() {
@@ -25,7 +28,7 @@ void loop() {
     thunderNoise = Serial.parseInt();
     isThunder = thunderNoise == 1;
 
-    // If thunder turned off, reset
+    // if thunder turned off, reset
     if (!isThunder) {
       noTone(buzzerPin);
       analogWrite(LEDpin, 0);
@@ -33,6 +36,10 @@ void loop() {
       inRumble = false;
     }
   }
+
+  value = analogRead(lightSensor);
+  Serial.println(value);
+  delay(100);
 
   // If thunder is enabled, play it incrementally
   if (isThunder) {

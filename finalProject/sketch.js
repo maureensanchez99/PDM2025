@@ -2,6 +2,9 @@ let port;
 let connectButton, lightningButton;
 let backgroundColor;
 let playLightning = false;
+let thunderNoise, thunderEnv;
+let lastLightningSoundTime = 0;
+const lightningSoundInterval = 1000;
 let eggSpriteSheet;
 let eggX = 0;  
 let eggSpeed = 0.75; 
@@ -9,12 +12,11 @@ let eggFrame = 0;
 let eggFrameInterval = 8;  
 let eggFrameCounter = 0;  
 const EGG_FRAMES = 7;
-const EGG_SIZE = 64; // Set the size of the egg sprite
+const EGG_SIZE = 64; 
 
 function preload() {
   eggSpritesheet = loadImage("media/egg.png");  
 }
-
 
 function setup() {
   createCanvas(700, 500);
@@ -26,33 +28,37 @@ function setup() {
   connectButton.mousePressed(connectToSerial);
 
   backgroundColor = color(140, 206, 230);
+  let originalEggSpeed = eggSpeed; // stores the original speed of the egg
 
-  lightningButton = createButton("Start Lightning");
-  lightningButton.position(20,600);
-  lightningButton.mousePressed(() => { playLightning = !playLightning; });
+  lightningButton = createButton("Lightning");
+  lightningButton.position(20, 600);
+  lightningButton.mousePressed(() => { 
+    playLightning = !playLightning; 
+    eggSpeed = playLightning ? originalEggSpeed * 3 : originalEggSpeed; // Reset to original speed when turned off
+  });
 }
 
 function draw() {
   background(backgroundColor);
-
-  if (port.opened()) {
-    let msg = playLightning ? "1\n" : "0\n";  
-    port.write(msg);
-  }
-  
   drawGround();
   drawLightning();
   drawEgg();
-
-  // Read light sensor value from Arduino
-  let str = port.readUntil('\n');
-  /*if (str !== "") {
-    let lightVal = Number(str.trim());
-    if (!isNaN(lightVal)) {
-      let hue = map(val, 0, 132, 0, 360);
-      backgroundColor = color(hue, 255, 255);
+  if (frameCount % 6 === 0) {
+    if (port.opened()) {
+      let msg = playLightning ? "1\n" : "0\n";  
+      port.write(msg);
     }
-  }*/
+  
+    let str = port.readUntil('\n');
+    if (str !== "") {
+      let lightVal = Number(str.trim());
+      if (!isNaN(lightVal)) {
+        let hue = map(lightVal, 0, 132, 0, 360);
+        backgroundColor = color(hue, 255, 255);
+      }
+    }
+  }
+  
 }
 
 function drawGround() {
