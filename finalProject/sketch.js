@@ -23,9 +23,14 @@ let cloudsOn = false;
 
 let chimeSynth, chimePart;
 let isChimePlaying = false;
+let breezeSound;
 
 function preload() {
   eggSpritesheet = loadImage("media/egg.png");  
+  breezeSound = loadSound("media/breezy.mp3", () => {
+    breezeSound.setLoop(true);      // ensure it loops automatically
+    breezeSound.playMode('sustain'); // avoids fading or restarting issues
+  });
 }
 
 function setup() {
@@ -110,11 +115,17 @@ function draw() {
   }
   if (cloudsOn) {
     drawClouds();
+    if (!breezeSound.isPlaying()) {
+      breezeSound.play();
+    }
   } else {
     if (isChimePlaying) {
       chimePart.stop();
       Tone.Transport.stop();
       isChimePlaying = false;
+    }
+    if (breezeSound.isPlaying()) {
+      breezeSound.stop();
     }
   }   
 }
