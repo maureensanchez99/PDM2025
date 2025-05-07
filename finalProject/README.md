@@ -23,6 +23,7 @@ It
 ![image](https://github.com/user-attachments/assets/712c957c-2fc7-4f87-bdf9-594f74b78b1b)
 
 ## *Video Demonstration*
+https://github.com/user-attachments/assets/7a0e4f6d-7296-4a45-9183-4c9e6908dcee
 
 ## *Schematics*
 
