@@ -14,6 +14,12 @@ Create online documentation of your project. Think of this documentation as the 
 ## *Narrative Description*
 Become an omnipotent being, commanding the weather. Control the world with digital and physical interfaces, and observe the manner in which the roaming NPC reacts to wind, lightning, etc.
 
+## *How It Works*
+-  Click the *Lightning* button to watch light strikes occur and the NPC sprite run around in a panic
+-  When selecting the *Wind*, clouds will move faster and the NPC sprite will be moving slower fighting back against the wind.
+-  Mess with the light exposure on the photoresistor sensor to affect how light/dark the sky will be.
+-  Selecting the pushbutton pin will activate the clouds so the clouds can be seen moving across the sky.  
+
 ## *Images*
 *Initial page*   
 ![image](https://github.com/user-attachments/assets/712c957c-2fc7-4f87-bdf9-594f74b78b1b)
@@ -34,7 +40,8 @@ https://github.com/user-attachments/assets/7a0e4f6d-7296-4a45-9183-4c9e6908dcee
 ![20250507_233804](https://github.com/user-attachments/assets/3406051f-4134-49af-b124-abeb2ced27f0)
 
 ## *Future Development*
-Although the core functionality was achieved, there were a few things I also wished to implement:
--  Longer Weather Patterns: I desired to replicate more weather patterns by implementing additional sensors. These components were, however, broken and couldn't be used.
+Although the core functionality was achieved, there were a few things I also wished to implement:  
+-  Longer Weather Patterns: I desired to replicate more weather patterns by implementing additional sensors. These components were, however, broken and couldn't be used.  
 -  Ambient Audio: Ambient audio would have added to the immersion of the experience, giving a soundscape even in instances where no specific weather events were being caused.
-In the future, I plan to repair the damaged sensor components and make the NPC more environment-aware with smoother animations, weather effects, and layered audio design.
+  
+In the future, I plan to repair the damaged sensor components and make the NPC more environment-aware with smoother animations, weather effects, and layered audio.
