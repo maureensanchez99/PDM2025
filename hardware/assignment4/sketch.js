@@ -1,7 +1,8 @@
+// Game states
 let GameStates = Object.freeze({
   START: "start",
   PLAY: "play",
-  END: "end",
+  END: "end"
 });
 
 let gameState = GameStates.START;
@@ -20,29 +21,10 @@ let backgroundNoise;
 const EGG_SIZE = 64;
 let bugSpeedMultiplier = 1;
 
-// Serial support
-let port;
-let connectButton;
-let isPortOpen = false;
-
-// Joystick-controlled cursor
-let cursorX = 300;
-let cursorY = 300;
-
 function preload() {
   gameFont = loadFont("media/PressStart2P-Regular.ttf");
   eggSpritesheet = loadImage("media/egg.png");
   backgroundImage = loadImage("media/bg.jpg");
-
-  if (typeof Tone !== "undefined") {
-    Tone.start()
-      .then(() => {
-        console.log("Tone.js started in preload");
-        squishSound = new Tone.Player("media/audio/egg_cracking.mp3").toDestination();
-        backgroundNoise = new Tone.Player("media/audio/clown_jingle.mp3").toDestination();
-      })
-      .catch((err) => console.error("Error starting Tone.js in preload:", err));
-  }
 }
 
 function setup() {
@@ -53,19 +35,6 @@ function setup() {
 
   for (let i = 0; i < bugCount; i++) {
     bugs.push(new Bug(random(50, width - 50), random(50, height - 50)));
-  }
-
-  // Serial setup only if supported
-  if ("serial" in navigator) {
-    port = createSerial();
-    connectButton = createButton("Connect to Arduino");
-    connectButton.position(10, height + 10);
-    connectButton.mousePressed(() => {
-      port.open().then(() => {
-        isPortOpen = true;
-        console.log("Serial port opened");
-      });
-    });
   }
 }
 
@@ -83,63 +52,52 @@ function draw() {
       displayEndScreen();
       break;
   }
-
-  // Draw joystick-controlled cursor
-  fill(255, 0, 0);
-  noStroke();
-  ellipse(cursorX, cursorY, 10, 10);
-
-  // Read joystick and button data
-  readSerialData();
 }
 
-function readSerialData() {
-  if (port && isPortOpen) {
-    let data = port.readUntil("\n").trim();
-    if (data) {
-      let [joystickX, joystickY, buttonState] = data.split(",").map(Number);
+function keyPressed() {
+  if ((gameState === GameStates.START || gameState === GameStates.END) && keyCode === ENTER) {
+    if (typeof Tone !== "undefined" && Tone.context.state !== "running") {
+      Tone.start().then(() => {
+        console.log("Tone.js started");
 
-      // Map joystick values to cursor movement
-      cursorX += map(joystickX, 0, 1023, -5, 5);
-      cursorY += map(joystickY, 0, 1023, -5, 5);
-
-      // Constrain cursor to canvas
-      cursorX = constrain(cursorX, 0, width);
-      cursorY = constrain(cursorY, 0, height);
-
-      // Check if the button is pressed
-      if (buttonState === 0) {
-        if (gameState === GameStates.START || gameState === GameStates.END) {
-          resetGame();
-          gameState = GameStates.PLAY;
-        } else if (gameState === GameStates.PLAY) {
-          checkBugCollision(cursorX, cursorY);
+        if (!backgroundNoise) {
+          backgroundNoise = new Tone.Player("media/audio/clown_jingle.mp3").toDestination();
+          backgroundNoise.loop = true;
+          backgroundNoise.start();
         }
+
+        if (!squishSound) {
+          squishSound = new Tone.Player("media/audio/egg_cracking.mp3").toDestination();
+        }
+
+        resetGame();
+        gameState = GameStates.PLAY;
+      });
+    } else {
+      if (backgroundNoise && backgroundNoise.state !== "started") {
+        backgroundNoise.loop = true;
+        backgroundNoise.start();
       }
+
+      resetGame();
+      gameState = GameStates.PLAY;
     }
   }
 }
 
-function checkBugCollision(x, y) {
+function mousePressed() {
   if (gameState === GameStates.PLAY) {
     for (let bug of bugs) {
-      if (!bug.isSquished && bug.isClicked(x, y)) {
-        // Play squish sound
+      if (!bug.isSquished && bug.isClicked(mouseX, mouseY)) {
         if (squishSound) {
-          if (squishSound.state === "started") squishSound.stop();
+          if (squishSound.state === "started") {
+            squishSound.stop();
+          }
           squishSound.start();
         }
-
-        // Squish the bug
         bug.squish();
         score++;
         increaseBugSpeed();
-
-        // Send signal to Arduino buzzer
-        if (port && isPortOpen) {
-          port.write("S\n"); // Send a signal to trigger the buzzer
-        }
-
         break;
       }
     }
